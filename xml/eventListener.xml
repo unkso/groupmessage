@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data xmlns="http://www.woltlab.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.woltlab.com http://www.woltlab.com/XSD/vortex/eventListener.xsd">
+	<import>
+		<!-- admin -->
+		<eventlistener name="userGroupAddFormCBM">
+			<environment>admin</environment>
+			<eventclassname>wcf\acp\form\UserGroupAddForm</eventclassname>
+			<eventname>saved</eventname>
+			<listenerclassname>wcf\system\event\listener\UserGroupAddFormCBMListener</listenerclassname>
+		</eventlistener>
+		<eventlistener name="userGroupAddFormCBMInherited">
+			<environment>admin</environment>
+			<eventclassname>wcf\acp\form\UserGroupAddForm</eventclassname>
+			<eventname>assignVariables</eventname>
+			<listenerclassname>wcf\system\event\listener\UserGroupAddFormCBMListener</listenerclassname>
+			<inherit>1</inherit>
+		</eventlistener>
+		<eventlistener name="userGroupAddFormCBMInherited">
+			<environment>admin</environment>
+			<eventclassname>wcf\acp\form\UserGroupAddForm</eventclassname>
+			<eventname>readFormParameters</eventname>
+			<listenerclassname>wcf\system\event\listener\UserGroupAddFormCBMListener</listenerclassname>
+			<inherit>1</inherit>
+		</eventlistener>
+		<eventlistener name="userGroupAddFormCBMInherited">
+			<environment>admin</environment>
+			<eventclassname>wcf\acp\form\UserGroupAddForm</eventclassname>
+			<eventname>save</eventname>
+			<listenerclassname>wcf\system\event\listener\UserGroupAddFormCBMListener</listenerclassname>
+			<inherit>1</inherit>
+		</eventlistener>
+		<eventlistener name="userGroupAddFormCBMInherited">
+			<environment>admin</environment>
+			<eventclassname>wcf\acp\form\UserGroupAddForm</eventclassname>
+			<eventname>validate</eventname>
+			<listenerclassname>wcf\system\event\listener\UserGroupAddFormCBMListener</listenerclassname>
+			<inherit>1</inherit>
+		</eventlistener>
+		<eventlistener name="userGroupEditFormCBM">
+			<environment>admin</environment>
+			<eventclassname>wcf\acp\form\UserGroupEditForm</eventclassname>
+			<eventname>readData</eventname>
+			<listenerclassname>wcf\system\event\listener\UserGroupAddFormCBMListener</listenerclassname>
+		</eventlistener>
+		<!-- /admin -->
+	</import>
+</data>
