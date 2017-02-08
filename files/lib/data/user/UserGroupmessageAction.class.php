@@ -69,16 +69,37 @@ class UserGroupmessageAction extends UserAction {
 								}
 								
 								$groupMembers[] = array(
+									'userTitle' => $groupMember->userTitle,
 									'username' => $groupMember->username,
 									'icon' => $groupMember->getAvatar()->getImageTag(16)
 								);
+							}
+							
+							$sortIndex = array();
+							foreach ($groupMembers as $key => $user) {
+								$sortorder = (int)$this->getSortOrder($user['userTitle']);
+								$sortIndex[$sortorder][] = $user;
+							}
+							
+							krsort($sortIndex, SORT_NUMERIC);
+							foreach ($sortIndex as $sortorder => $users) {
+								usort($users, array($this,'sortByOrder'));
+								$sortIndex[$sortorder] = $users;
+							}
+							
+							$memberList = array();
+							foreach ($sortIndex as $sortorder => $users) {
+								foreach ($users as $key => $user) {
+									$memberList[] = $user;
+								}
 							}
 							
 							$list[] = array(
 								'label' => $groupName,
 								'objectID' => $group->groupID,
 								'type' => 'group',
-								'members' => $groupMembers,
+								'members' => $memberList,
+								//'members' => $groupMembers,
 								'memberstring' => $memberString
 							);
 						}
@@ -106,5 +127,40 @@ class UserGroupmessageAction extends UserAction {
 		}
 		
 		return $list;
+	}
+	
+	public function getSortOrder($userTitle) {
+		if ($userTitle == "" || $userTitle == null) {
+			return -1;
+		}
+	
+		preg_match('#\((.*?)\)#', trim($userTitle), $paygrade);
+		if( $paygrade === false || count($paygrade)==0 ) {
+			return -1;
+		}
+		
+		$removeChars = array("-", "_", "[", "]", " ");
+		$paygrade = str_replace($removeChars, "", $paygrade[1]);
+		
+		$letter = $paygrade[0];
+		$number = substr($paygrade, 1, 2);
+		
+		if ($letter=="O" || $letter=="o") {
+			return $number+20;
+		}
+		
+		if ($letter=="W" || $letter=="w") {
+			$number = substr($paygrade, 2, 2);
+			return $number+10;
+		}
+		
+		return $number;
+	}
+	
+	public function sortByOrder($a, $b) {
+		//return $a['username'] - $b['username'];
+		
+		if ($a['username']==$b['username']) return 0;
+		return ($a['username']<$b['username'])?-1:1;
 	}
 }
