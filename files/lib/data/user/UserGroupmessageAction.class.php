@@ -60,16 +60,12 @@ class UserGroupmessageAction extends UserAction {
 							$statement = WCF::getDB()->prepareStatement($sql);
 							$statement->execute(array($group->groupID));
 							$groupMembers = array();
-							$memberString = "";
 							while ($row = $statement->fetchArray()) {
 								$groupMember = UserProfile::getUserProfile($row['userID']);
 								
-								if ($row['userID'] != WCF::getUser()->userID) {
-									$memberString .= $groupMember->username . ", ";
-								}
-								
 								$groupMembers[] = array(
 									'userTitle' => $groupMember->userTitle,
+									'userID' => $row['userID'],
 									'username' => $groupMember->username,
 									'icon' => $groupMember->getAvatar()->getImageTag(16)
 								);
@@ -91,6 +87,13 @@ class UserGroupmessageAction extends UserAction {
 							foreach ($sortIndex as $sortorder => $users) {
 								foreach ($users as $key => $user) {
 									$memberList[] = $user;
+								}
+							}
+							
+							$memberString = "";
+							foreach($memberList as $user) {
+								if ($user['userID'] != WCF::getUser()->userID) {
+									$memberString .= $user['username'] . ", ";
 								}
 							}
 							
