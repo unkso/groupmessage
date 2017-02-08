@@ -95,6 +95,7 @@ class UserGroupmessageAction extends UserAction {
 								if ($user['userID'] != WCF::getUser()->userID) {
 									$memberString .= $user['username'] . ", ";
 								}
+								
 							}
 							
 							$list[] = array(
