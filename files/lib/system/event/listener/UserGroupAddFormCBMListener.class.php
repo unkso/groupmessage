@@ -6,7 +6,7 @@ use wcf\form\IForm;
 use wcf\page\IPage;
 use wcf\system\WCF;
 use wcf\util\StringUtil;
-use wcf\system\language\I18nHandler;
+use wcf\system\exception\UserInputException;
 
 class UserGroupAddFormCBMListener implements IParameterizedEventListener {
 	/**
@@ -19,7 +19,7 @@ class UserGroupAddFormCBMListener implements IParameterizedEventListener {
 	 * messagingAlias VARCHAR(255)
 	 * @var	STRING
 	 */
-	protected $canBeMessaged = 0;
+	protected $messagingAlias = '';
 	
 	/**
 	 * instance of UserGroupAddForm
@@ -67,16 +67,11 @@ class UserGroupAddFormCBMListener implements IParameterizedEventListener {
 	 * @see	IForm::readFormParameters()
 	 */
 	protected function readFormParameters() {
-		// Read i18n values
-		I18nHandler::getInstance()->readValues();
-		
 		if (isset($_POST['canBeMessaged'])) {
 			$this->canBeMessaged = $_POST['canBeMessaged'];
 		}
 		if (isset($_POST['messagingAlias'])) {
-			if (I18nHandler::getInstance()->isPlainValue('messagingAlias')) {
-				$this->messagingAlias = I18nHandler::getInstance()->getValue('messagingAlias');
-			}
+			$this->messagingAlias = $_POST['messagingAlias'];
 		}
 	}
 	
@@ -114,12 +109,25 @@ class UserGroupAddFormCBMListener implements IParameterizedEventListener {
 		}
 		
 		// Check the case when the option is enabled but no alias given
-		if ($this->canBeMessaged && $this->messagingAlias == '') {
-			throw new UserInputException('messagingAlias', 'empty');
+		try {
+			if ($this->canBeMessaged && $this->messagingAlias == '') {
+				throw new UserInputException('messagingAlias', 'empty');
+			}
+		} catch (UserInputException $e) {
+			$this->eventObj->errorType[$e->getField()] = $e->getType();
 		}
 		
-		if (!filter_var($this->messagingAlias, FILTER_VALIDATE_STRING)) {
-			throw new UserInputException('messagingAlias', 'invalid');
+		// Check for invalid string input
+		try {
+			if (!is_string($this->messagingAlias)) {
+				throw new UserInputException('messagingAlias', 'invalid');
+			}
+			
+			if ( filter_var($this->messagingAlias, FILTER_SANITIZE_STRING) !== $this->messagingAlias ) {
+				throw new UserInputException('messagingAlias', 'invalid');	
+			}
+		} catch (UserInputException $e) {
+			$this->eventObj->errorType[$e->getField()] = $e->getType();
 		}
 	}
 }

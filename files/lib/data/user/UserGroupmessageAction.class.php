@@ -44,7 +44,8 @@ class UserGroupmessageAction extends UserAction {
 		if ($this->parameters['data']['includeUserGroups']) {
 			$accessibleGroups = UserGroup::getAccessibleGroups();
 			foreach ($accessibleGroups as $group) {
-				$groupName = $group->getName();
+				//$groupName = $group->getName();
+				$groupName = $group->messagingAlias;
 				if (!in_array($groupName, $excludedSearchValues)) {
 					$pos = mb_strripos($groupName, $searchString);
 					if ($pos !== false && $pos == 0) {
