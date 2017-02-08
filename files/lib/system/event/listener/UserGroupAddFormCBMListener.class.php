@@ -6,11 +6,18 @@ use wcf\form\IForm;
 use wcf\page\IPage;
 use wcf\system\WCF;
 use wcf\util\StringUtil;
+use wcf\system\language\I18nHandler;
 
 class UserGroupAddFormCBMListener implements IParameterizedEventListener {
 	/**
 	 * canBeMessaged TINYINT of the created or edited UserGroup
-	 * @var	string
+	 * @var	INT
+	 */
+	protected $canBeMessaged = 0;
+	
+	/**
+	 * messagingAlias VARCHAR(255)
+	 * @var	STRING
 	 */
 	protected $canBeMessaged = 0;
 	
@@ -24,7 +31,12 @@ class UserGroupAddFormCBMListener implements IParameterizedEventListener {
 	 * @see	IPage::assignVariables()
 	 */
 	protected function assignVariables() {
-		WCF::getTPL()->assign('canBeMessaged', $this->canBeMessaged);
+		WCF::getTPL()->assign(
+			array(
+				'canBeMessaged', $this->canBeMessaged,
+				'messagingAlias', $this->messagingAlias
+			)
+		);
 	}
 	
 	/**
@@ -47,6 +59,7 @@ class UserGroupAddFormCBMListener implements IParameterizedEventListener {
 	protected function readData(UserGroupEditForm $form) {
 		if (empty($_POST)) {
 			$this->canBeMessaged = $form->group->canBeMessaged;
+			$this->messagingAlias = $form->group->messagingAlias;
 		}
 	}
 	
@@ -54,8 +67,16 @@ class UserGroupAddFormCBMListener implements IParameterizedEventListener {
 	 * @see	IForm::readFormParameters()
 	 */
 	protected function readFormParameters() {
+		// Read i18n values
+		I18nHandler::getInstance()->readValues();
+		
 		if (isset($_POST['canBeMessaged'])) {
 			$this->canBeMessaged = $_POST['canBeMessaged'];
+		}
+		if (isset($_POST['messagingAlias'])) {
+			if (I18nHandler::getInstance()->isPlainValue('messagingAlias')) {
+				$this->messagingAlias = I18nHandler::getInstance()->getValue('messagingAlias');
+			}
 		}
 	}
 	
@@ -64,6 +85,7 @@ class UserGroupAddFormCBMListener implements IParameterizedEventListener {
 	 */
 	protected function save(UserGroupAddForm $form) {
 		$form->group->canBeMessaged = $this->canBeMessaged;
+		$form->group->messagingAlias = $this->messagingAlias;
 		
 		if ($this->canBeMessaged) {
 			$form->additionalFields['canBeMessaged'] = $this->canBeMessaged;
@@ -71,6 +93,8 @@ class UserGroupAddFormCBMListener implements IParameterizedEventListener {
 		else {
 			$form->additionalFields['canBeMessaged'] = 0;
 		}
+		
+		$form->additionalFields['messagingAlias'] = $this->messagingAlias;
 	}
 	
 	/**
@@ -78,6 +102,7 @@ class UserGroupAddFormCBMListener implements IParameterizedEventListener {
 	 */
 	protected function saved() {
 		$this->canBeMessaged = 0;
+		$this->messagingAlias = '';
 	}
 	
 	/**
@@ -86,6 +111,15 @@ class UserGroupAddFormCBMListener implements IParameterizedEventListener {
 	protected function validate() {
 		if (empty($this->canBeMessaged)) {
 			return;
+		}
+		
+		// Check the case when the option is enabled but no alias given
+		if ($this->canBeMessaged && $this->messagingAlias == '') {
+			throw new UserInputException('messagingAlias', 'empty');
+		}
+		
+		if (!filter_var($this->messagingAlias, FILTER_VALIDATE_STRING)) {
+			throw new UserInputException('messagingAlias', 'invalid');
 		}
 	}
 }
