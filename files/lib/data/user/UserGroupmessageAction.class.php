@@ -42,7 +42,8 @@ class UserGroupmessageAction extends UserAction {
 		$list = array();
 		
 		if ($this->parameters['data']['includeUserGroups']) {
-			$accessibleGroups = UserGroup::getAccessibleGroups();
+			//$accessibleGroups = UserGroup::getAccessibleGroups();
+			$accessibleGroups = UserGroup::getGroupsByType(array(4));
 			foreach ($accessibleGroups as $group) {
 				//$groupName = $group->getName();
 				$groupName = $group->messagingAlias;
