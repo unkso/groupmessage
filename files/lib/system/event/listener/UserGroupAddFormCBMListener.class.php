@@ -79,9 +79,6 @@ class UserGroupAddFormCBMListener implements IParameterizedEventListener {
 	 * @see	IForm::save()
 	 */
 	protected function save(UserGroupAddForm $form) {
-		$form->group->canBeMessaged = $this->canBeMessaged;
-		$form->group->messagingAlias = $this->messagingAlias;
-		
 		if ($this->canBeMessaged) {
 			$form->additionalFields['canBeMessaged'] = $this->canBeMessaged;
 		}
